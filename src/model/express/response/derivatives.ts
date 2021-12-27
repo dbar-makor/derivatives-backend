@@ -34,8 +34,19 @@ type IGetDerivativeResponse = express.Response<
   }
 >;
 
+type IGetFloorBrokersResponse = express.Response<
+  IServerResponse & {
+    data?: {
+      id: number;
+      name: string;
+      company: string;
+    }[];
+  }
+>;
+
 export {
   IaddDerivativesResponse,
   IGetDerivativesResponse,
   IGetDerivativeResponse,
+  IGetFloorBrokersResponse,
 };

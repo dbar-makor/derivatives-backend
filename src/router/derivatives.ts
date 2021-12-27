@@ -1,4 +1,6 @@
 import express from "express";
+import multer from "multer";
+const upload = multer({ dest: "hey/" });
 
 import { auth } from "../middleware/auth";
 
@@ -11,7 +13,7 @@ import {
 
 const router = express.Router();
 
-router.post("/", auth, addDerivatives);
+router.post("/", auth, upload.single("csv"), addDerivatives);
 
 router.get("/", auth, getDerivatives);
 

@@ -1,5 +1,6 @@
 import fs from "fs";
 import csv from "csv-parser";
+import rp from "request-promise";
 import moment from "moment";
 import converter from "json-2-csv";
 
@@ -17,11 +18,13 @@ import {
   IGetDerivativesRequest,
   IGetDerivativeRequest,
   IDownloadFilesRequest,
+  IGetFloorBrokersRequest,
 } from "../model/express/request/derivatives";
 import {
   IaddDerivativesResponse,
   IGetDerivativesResponse,
   IGetDerivativeResponse,
+  IGetFloorBrokersResponse,
 } from "../model/express/response/derivatives";
 
 import {
@@ -35,67 +38,82 @@ const addDerivatives = async (
   req: IaddDerivativesRequest,
   res: IaddDerivativesResponse
 ) => {
+  const base64WEX = req.body.file;
+  const WEX: IWEXInterface[] = [];
+  const date = new Date();
+  const formattedDate = moment(date).format("DD-MM-YYYY-HH-mm-ss");
+  let DRV: IDRVInterface[] = [];
+  let canceledInversePairsArrayWEX: IWEXInterface[] = [];
+  let WEXArrayFilteredByDRV: IWEXInterface[] = [];
+  let WEXGroupedArrayFilteredByDRV: IWEXInterface[] = [];
+  let WEXfilterdByGroupedWEX: IWEXInterface[] = [];
+  let WEXfilterdByGroupedDRV: IWEXInterface[] = [];
+  let WEXArrayGrouped: IWEXInterface[] = [];
+  let DRVArrayGrouped: IDRVInterface[] = [];
+  let unresolved: IWEXInterface[] = [];
+
   ServerGlobal.getInstance().logger.info(
     `<addDerivatives>: Start processing request`
   );
 
-  // Find the user
-  const userByID = await User.findByPk(req.user_id);
-
-  if (!userByID) {
-    ServerGlobal.getInstance().logger.error(
-      `<editProfile>: Failed to get user details for user id ${req.user_id}`
-    );
-
-    res.status(401).send({
-      success: false,
-      message: "Could not find user",
-    });
-    return;
-  }
-
   try {
-    const base64WEX = req.body[0].file;
-    const base64DRV = req.body[1].file;
-    const WEX: IWEXInterface[] = [];
-    const DRV: IDRVInterface[] = [];
-    const date = new Date();
-    const formattedDate = moment(date).format("DD-MM-YYYY-HH-mm-ss");
+    const userByID = await User.findByPk(req.user_id);
 
-    let canceledInversePairsArrayWEX: IWEXInterface[] = [];
-    let WEXArrayFilteredByDRV: IWEXInterface[] = [];
-    let WEXGroupedArrayFilteredByDRV: IWEXInterface[] = [];
-    let WEXfilterdByGroupedWEX: IWEXInterface[] = [];
-    let WEXfilterdByGroupedDRV: IWEXInterface[] = [];
-    let WEXArrayGrouped: IWEXInterface[] = [];
-    let DRVArrayGrouped: IDRVInterface[] = [];
-    let unresolved: IWEXInterface[] = [];
-
-    // Check if WEX base64WEX/base64WEX are valid
-    if (!base64WEX || !base64DRV) {
+    if (!userByID) {
       ServerGlobal.getInstance().logger.error(
-        "<addDerivatives>: Failed to process base64WEX/base64DRV"
+        `<editProfile>: Failed to get user details for user id ${req.user_id}`
+      );
+
+      res.status(401).send({
+        success: false,
+        message: "Could not find user",
+      });
+      return;
+    }
+
+    rp(
+      `${process.env.MAKOR_X_URL}${process.env.MAKOR_X_API_KEY}&month=8&year=2021`
+    )
+      .then((body) => {
+        DRV = body;
+        derivativesActions();
+      })
+      .catch((err) => {
+        ServerGlobal.getInstance().logger.error(
+          `<addDerivatives>: Failed to get DRV from makor-x because of error: ${err}`
+        );
+
+        res.status(400).send({
+          success: false,
+          message: `Failed to get DRV from makor-x because of error: ${err}`,
+        });
+        return;
+      });
+
+    // Check if WEX base64WEX is valid
+    if (!base64WEX) {
+      ServerGlobal.getInstance().logger.error(
+        "<addDerivatives>: Failed to process base64WEX"
       );
 
       res.status(400).send({
         success: false,
-        message: "invalid files",
+        message: "invalid file",
       });
       return;
     }
 
     const WEXSplited = base64WEX.split(";base64,").pop();
-    const DRVSplited = base64DRV.split(";base64,").pop();
 
-    // Check if WEX base64WEX/base64WEX are valid
-    if (!WEXSplited || !DRVSplited) {
+    // Check if WEX base64WEX is valid
+    if (!WEXSplited) {
       ServerGlobal.getInstance().logger.error(
         "<addDerivatives>: Failed to process WEXSplited/DRVSplited"
       );
 
       res.status(400).send({
         success: false,
-        message: "invalid files",
+        message: "invalid file",
       });
       return;
     }
@@ -107,26 +125,10 @@ const addDerivatives = async (
         encoding: "base64",
       }
     );
-    fs.writeFileSync(
-      `assets/DRV-${userByID.username}-${formattedDate}.csv`,
-      DRVSplited,
-      {
-        encoding: "base64",
-      }
-    );
-
     fs.createReadStream(`assets/WEX-${userByID.username}-${formattedDate}.csv`)
       .pipe(csv())
       .on("data", (data: IWEXInterface) => {
         WEX.push(data);
-      });
-    fs.createReadStream(`assets/DRV-${userByID.username}-${formattedDate}.csv`)
-      .pipe(csv())
-      .on("data", (data: IDRVInterface) => {
-        DRV.push(data);
-      })
-      .on("end", () => {
-        derivativesActions();
       });
 
     ServerGlobal.getInstance().logger.info(
@@ -135,6 +137,8 @@ const addDerivatives = async (
 
     const derivativesActions = async () => {
       const WEXUniqueDates = WEXUniqueDatesArray(WEX);
+
+      console.log(DRV.map((e) => e.date));
 
       // Separate WEX result by date
       const WEXArraySeparatedByDates: IWEXInterfaceObjectOfArrays = WEX.reduce(
@@ -594,8 +598,6 @@ const addDerivatives = async (
 
       // Get WEX group keys
       const groupedDRVArrayKeys = Object.keys(groupedDRVArray);
-
-      // console.log(groupedDRVArrayKeys);
 
       // Sixth step - group of execution from source V group of executions in target
       for (const element of groupedDRVArrayKeys) {
