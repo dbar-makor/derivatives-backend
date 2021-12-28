@@ -2,19 +2,21 @@ import { IDRVInterface } from "../model/shared/derivatives";
 
 // Formatting DRV date
 export const formatDRVDate = (date: string) => {
-  const splitedMonth = date.split("/")[0];
-  const removeLeadingZeroMonth = parseInt(splitedMonth, 10);
-  const checkIfRemoveLeadingZeroMonth = isNaN(removeLeadingZeroMonth)
-    ? ""
-    : removeLeadingZeroMonth;
-  const splitedDayAndYear = date.substring(date.indexOf("/"));
-  return (date = `${checkIfRemoveLeadingZeroMonth}${splitedDayAndYear}`);
+  if (!date) {
+    return date;
+  }
+  const day = date.toString().split("-")[2];
+  const removeLeadingZeroDay = parseInt(day, 10);
+  const month = date.toString().split("-")[1];
+  const removeLeadingZeroMonth = parseInt(month, 10);
+  const year = date.toString().split("-")[0];
+  return (date = `${removeLeadingZeroMonth}/${removeLeadingZeroDay}/${year}`);
 };
 
 // Grouping DRV array
 export const DRVGroupBy = (
   array: IDRVInterface[],
-  f: (element: IDRVInterface) => (string | undefined)[]
+  f: (element: IDRVInterface) => (string | number | undefined)[]
 ) => {
   const groups: { [key: string]: IDRVInterface[] } = {};
 

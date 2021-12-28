@@ -71,7 +71,6 @@ ServerGlobal.getInstance()
     ServerGlobal.getInstance().logger.info(`Server is running on port ${port}`);
   })
   .catch((e) => {
-    console.log(e);
     ServerGlobal.getInstance().logger.info(
       `Failed to initiated connection for mysql database with error: ${e}`
     );
