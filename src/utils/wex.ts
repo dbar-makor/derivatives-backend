@@ -1,4 +1,7 @@
-import { IWEXInterface } from "../model/shared/derivatives";
+import {
+  IWEXInterface,
+  IWEXInterfaceObjectOfArrays,
+} from "../model/shared/derivatives";
 
 // Convert WEX array to unique dates only array
 export const WEXUniqueDatesArray = (array: IWEXInterface[]) => {
@@ -23,6 +26,7 @@ export const formatWEXExpiry = (date: string) => {
   return (date = `${removeLeadingZeroMonth}/${day}/${year}`);
 };
 
+// format WEX date
 export const formatWEXDate = (date: string) => {
   if (!date) {
     return date;
@@ -38,7 +42,7 @@ export const formatWEXDate = (date: string) => {
 // Grouping WEX array
 export const WEXGroupBy = (
   array: IWEXInterface[],
-  f: (element: IWEXInterface) => (string | number | undefined)[]
+  f: (element: IWEXInterface) => (string | number | undefined)[],
 ) => {
   if (!array) {
     return array;
@@ -52,4 +56,14 @@ export const WEXGroupBy = (
     groups[group].push(object);
   });
   return groups;
+};
+
+// Separate WEX Array by date
+export const separateWEXArray = (array: IWEXInterface[]) => {
+  const result: IWEXInterfaceObjectOfArrays = array.reduce((arr, WEX) => {
+    arr[WEX.modifiedDate!] = arr[WEX.modifiedDate!] || [];
+    arr[WEX.modifiedDate!].push(WEX);
+    return arr;
+  }, Object.create(null));
+  return result;
 };
