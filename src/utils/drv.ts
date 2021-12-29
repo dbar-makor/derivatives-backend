@@ -1,7 +1,7 @@
-import { IDRVInterface } from "../model/shared/derivatives";
+import { IDRV, IDRVObject } from "../model/shared/derivatives";
 
 // Formatting DRV date
-export const formatDRVDate = (date: string) => {
+export const DRVDateFormat = (date: string) => {
   if (!date) {
     return date;
   }
@@ -13,12 +13,12 @@ export const formatDRVDate = (date: string) => {
   return (date = `${removeLeadingZeroMonth}/${removeLeadingZeroDay}/${year}`);
 };
 
-// Grouping DRV array
+// Grouping DRV
 export const DRVGroupBy = (
-  array: IDRVInterface[],
-  f: (element: IDRVInterface) => (string | number | undefined)[]
+  array: IDRV[],
+  f: (element: IDRV) => (string | number | undefined)[]
 ) => {
-  const groups: { [key: string]: IDRVInterface[] } = {};
+  const groups: { [key: string]: IDRV[] } = {};
 
   array.forEach((object) => {
     const group = f(object).join("-");
@@ -27,4 +27,14 @@ export const DRVGroupBy = (
     groups[group].push(object);
   });
   return groups;
+};
+
+// Separate DRV by date
+export const DRVDatesObject = (array: IDRV[]) => {
+  const result: IDRVObject = array.reduce((arr, WEX) => {
+    arr[WEX.modifiedDate!] = arr[WEX.modifiedDate!] || [];
+    arr[WEX.modifiedDate!].push(WEX);
+    return arr;
+  }, Object.create(null));
+  return result;
 };

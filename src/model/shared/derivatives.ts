@@ -1,30 +1,30 @@
-export interface IWEXInterfaceObjectOfArrays {
-  [key: string]: IWEXInterface[];
+export interface IWEXObject {
+  [key: string]: IWEX[];
 }
 
-export interface IDRVInterfaceObjectOfArrays {
-  [key: string]: IDRVInterface[];
+export interface IDRVObject {
+  [key: string]: IDRV[];
 }
 
-export interface IWEXInterface {
+export interface IWEX {
   readonly User?: string;
-  Date?: string;
+  readonly Date?: string;
   readonly Route?: string;
-  Side?: string;
-  "Exec Qty"?: string;
+  readonly Side?: string;
+  readonly "Exec Qty"?: string;
   readonly Security?: string;
   readonly Root?: string;
   readonly Expiry?: string;
   readonly Strike?: string;
   readonly "Call/Put"?: string;
-  "Average Price"?: string;
+  readonly "Average Price"?: string;
   readonly Portfolio?: string;
   readonly "Commission Type"?: string;
   readonly "Commission Rate"?: string;
   readonly "WEX Connect Rate"?: string;
   readonly "Exch. Fee Rate"?: string;
   readonly "Clearing Fee"?: string;
-  "Total Charge"?: string;
+  readonly "Total Charge"?: string;
   readonly modifiedDate?: string;
   readonly modifiedUser?: string;
   readonly modifiedSide?: string;
@@ -42,7 +42,7 @@ export interface IWEXInterface {
   removed?: boolean;
 }
 
-export interface IDRVInterface {
+export interface IDRV {
   readonly drv_trade_id?: string;
   readonly drv_trade_client_trader_id?: string;
   readonly drv_trade_client_account_execution_id?: string;
