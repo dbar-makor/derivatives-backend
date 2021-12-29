@@ -4,6 +4,7 @@ import express from "express";
 interface IAddDerivativesRequest extends IAuthenticatedRequest {
   readonly body: Readonly<{
     file: string;
+    name: string;
     date: string;
     floorBroker: string;
   }>;

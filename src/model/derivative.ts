@@ -6,28 +6,42 @@ import IDBAttribute from "./shared/db-table";
 interface IDerivativesAttributes extends IDBAttribute {
   readonly date: string;
   readonly username: string;
+  readonly floorBroker: string;
   readonly wex: string;
-  readonly drv: string;
-  readonly matched: number;
-  readonly unmatched: number;
-  readonly complete: number;
+  readonly fileName: string;
+  readonly totalCount: number;
+  readonly totalCharge: number;
+  readonly matchedCount: number;
+  readonly matchSumCharge: number;
+  readonly matchedSumPercentage: number;
+  readonly unmatchedCount: number;
+  readonly unmatchedGroupCount: number;
+  readonly unmatchedSumCharge: number;
+  readonly unmatchedSumPercentage: number;
   readonly unresolved: string;
 }
 
 class Derivative
   extends Sequelize.Model<
-    Optional<IDerivativesAttributes, "id" | "createdAt" | "username">
+    Optional<IDerivativesAttributes, "id" | "date" | "createdAt">
   >
   implements IDerivativesAttributes
 {
   public readonly id!: number;
   public readonly date!: string;
   public readonly username!: string;
+  public readonly floorBroker!: string;
   public readonly wex!: string;
-  public readonly drv!: string;
-  public readonly matched!: number;
-  public readonly unmatched!: number;
-  public readonly complete!: number;
+  public readonly fileName!: string;
+  public readonly totalCount!: number;
+  public readonly totalCharge!: number;
+  public readonly matchedCount!: number;
+  public readonly matchSumCharge!: number;
+  public readonly matchedSumPercentage!: number;
+  public readonly unmatchedCount!: number;
+  public readonly unmatchedGroupCount!: number;
+  public readonly unmatchedSumCharge!: number;
+  public readonly unmatchedSumPercentage!: number;
   public readonly unresolved!: string;
 }
 
@@ -48,21 +62,43 @@ Derivative.init(
       type: Sequelize.STRING,
       allowNull: false,
     },
+    floorBroker: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
     wex: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    drv: {
+    fileName: {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    matched: {
+    totalCount: {
       type: Sequelize.INTEGER.UNSIGNED,
     },
-    unmatched: {
+    totalCharge: {
       type: Sequelize.INTEGER.UNSIGNED,
     },
-    complete: {
+    matchedCount: {
+      type: Sequelize.INTEGER.UNSIGNED,
+    },
+    matchSumCharge: {
+      type: Sequelize.INTEGER.UNSIGNED,
+    },
+    matchedSumPercentage: {
+      type: Sequelize.INTEGER.UNSIGNED,
+    },
+    unmatchedCount: {
+      type: Sequelize.INTEGER.UNSIGNED,
+    },
+    unmatchedGroupCount: {
+      type: Sequelize.INTEGER.UNSIGNED,
+    },
+    unmatchedSumCharge: {
+      type: Sequelize.INTEGER.UNSIGNED,
+    },
+    unmatchedSumPercentage: {
       type: Sequelize.INTEGER.UNSIGNED,
     },
     unresolved: {

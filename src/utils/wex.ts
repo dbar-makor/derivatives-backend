@@ -5,6 +5,7 @@ export const WEXUniqueDatesArray = (array: IWEX[]) => {
   if (!array) {
     return array;
   }
+
   const dates = array.map((date: IWEX) => date.modifiedDate);
   const uniqueDates = dates.filter((item, pos) => dates.indexOf(item) == pos);
 
@@ -16,6 +17,7 @@ export const formatWEXExpiry = (date: string) => {
   if (!date) {
     return date;
   }
+
   const day = date!.split("/")[0];
   const month = date.split("/")[1];
   const removeLeadingZeroMonth = parseInt(month, 10);
@@ -28,6 +30,7 @@ export const WEXDateFormat = (date: string) => {
   if (!date) {
     return date;
   }
+
   const month = date.toString().split("/")[0];
   const removeLeadingZeroMonth = parseInt(month, 10);
   const day = date.toString().split("/")[1];
@@ -44,6 +47,7 @@ export const WEXGroupBy = (
   if (!array) {
     return array;
   }
+
   const groups: { [key: string]: IWEX[] } = {};
 
   array.forEach((object) => {
@@ -57,10 +61,27 @@ export const WEXGroupBy = (
 
 // Separate WEX Array by date
 export const WEXDatesObject = (array: IWEX[]) => {
+  if (!array) {
+    return array;
+  }
+
   const result: IWEXObject = array.reduce((arr, WEX) => {
     arr[WEX.modifiedDate!] = arr[WEX.modifiedDate!] || [];
     arr[WEX.modifiedDate!].push(WEX);
     return arr;
   }, Object.create(null));
   return result;
+};
+
+// Modify total charge
+export const WEXModifiyTotalCharge = (totalCharge: string) => {
+  if (!totalCharge) {
+    return Number(totalCharge);
+  }
+
+  if (totalCharge.includes("$(")) {
+    return -Math.abs(Number(totalCharge.replace("$", "").replace(/[()]/g, "")));
+  }
+
+  return Number(totalCharge.replace("$", ""));
 };
