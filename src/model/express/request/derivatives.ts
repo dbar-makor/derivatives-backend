@@ -6,7 +6,7 @@ interface IAddDerivativesRequest extends IAuthenticatedRequest {
     file: string;
     name: string;
     date: string;
-    floorBroker: string;
+    floorBrokerID: number;
   }>;
 }
 

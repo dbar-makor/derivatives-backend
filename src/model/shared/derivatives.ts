@@ -68,4 +68,5 @@ export interface IDRV {
   modifiedStrike?: number;
   modifiedOption?: string;
   modifiedPrice?: number;
+  modifiedDRVTradeClientAccountExecutionID?: number;
 }

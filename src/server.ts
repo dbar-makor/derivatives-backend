@@ -61,7 +61,7 @@ server.on("error", onError);
 server.on("listening", onListening);
 
 ServerGlobal.getInstance()
-  .db.sync()
+  .db.sync({ force: true })
   .then(() => {
     ServerGlobal.getInstance().logger.info(
       "Successfully initiated connection for mysql datebase"

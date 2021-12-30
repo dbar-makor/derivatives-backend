@@ -11,7 +11,6 @@ type IGetDerivativesResponse = express.Response<
       date: string;
       wex: string;
       username: string;
-      floorBroker: string;
       matchedCount: number;
       matchedSumPercentage: number;
       unmatchedCount: number;

@@ -61,12 +61,12 @@ const addDerivatives = async (
     const date = req.body.date;
     const fileName = req.body.name;
     const base64WEX = req.body.file;
-    const floorBroker = req.body.floorBroker;
+    const floorBrokerID = req.body.floorBrokerID;
 
     const formatDateYear = moment(date).format("YYYY");
     const formatDateMonth = moment(date).format("M");
 
-    if (!date && !base64WEX && !floorBroker && !fileName) {
+    if (!date && !base64WEX && !floorBrokerID && !fileName) {
       ServerGlobal.getInstance().logger.error(
         `<editProfile>: Failed because of invalid fields`
       );
@@ -715,9 +715,6 @@ const addDerivatives = async (
       // matched Sum Percentage
       const matchedSumPercentage = (matchedCount * 100) / modifiedWEX.length;
 
-      // [12:19] Avishai Haouzi
-      // unmatch sum charge / total charge * 100
-
       // unmatched Sum Percentage
       const unmatchedSumPercentage = (unmatchedSumCharge / totalCharge) * 100;
 
@@ -779,7 +776,7 @@ const addDerivatives = async (
       await Derivative.create({
         date: formattedCurrentDate,
         username: userByID.username,
-        floorBroker: floorBroker,
+        floorBrokerID: floorBrokerID,
         wex: `WEX-${userByID.username}-${formattedCurrentDate}.csv`,
         fileName: fileName,
         totalCount: modifiedWEX.length,
@@ -850,7 +847,7 @@ const getDerivatives = async (
         date: derivative.date,
         wex: derivative.wex,
         username: derivative.username,
-        floorBroker: derivative.floorBroker,
+        floorBrokerID: derivative.floorBrokerID,
         matchedCount: derivative.matchedCount,
         matchedSumPercentage: derivative.matchedSumPercentage,
         unmatchedCount: derivative.unmatchedCount,
